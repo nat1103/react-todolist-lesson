@@ -1,15 +1,17 @@
 import React from 'react';
-import { Task } from './TodoListWithDesign';
+import { useState } from 'react';
+import { Task } from '../TodoListWithDesign';
 import { Button } from 'antd';
-import { CloseOutlined } from '@ant-design/icons';
+import { CloseOutlined, EditOutlined } from '@ant-design/icons';
 
 interface TodoItemProps {
     deleteTask: (index: string) => void;
+    editTask: (index: string) => void;
     unique: string;
     label: Task;
 }
 
-const TodoItem = ({ deleteTask ,unique, label }: TodoItemProps) => {
+const TodoItem = ({ deleteTask, editTask, unique, label }: TodoItemProps) => {
     return (
         <>
             {label.description}
@@ -18,6 +20,12 @@ const TodoItem = ({ deleteTask ,unique, label }: TodoItemProps) => {
                 danger
                 type='primary'
                 onClick={() => deleteTask(unique)}
+            />
+
+            <Button
+                icon={<EditOutlined />}
+                type='primary'
+                onClick={() => editTask(unique)}
             />
         </>
     )

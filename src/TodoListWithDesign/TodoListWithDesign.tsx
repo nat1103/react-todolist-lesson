@@ -6,7 +6,7 @@ import { v4 as uuidv4 } from 'uuid';
 
 
 
-interface ToDo {
+export interface ToDo {
     label: string;
     value: string;
     list?: Array<Task>;
@@ -35,7 +35,7 @@ const TodoListWithDesign = () => {
     const [displayButtonTask, setDisplayButtonTask] = useState<Array<boolean>>([true, true])
 
     const handleGetNewColumn = (e: React.ChangeEvent<HTMLInputElement>) => {
-        setNewStatue({ label: e.target.value, value: e.target.value , list: [] });
+        setNewStatue({ label: e.target.value, value: e.target.value, list: [] });
         setDisplayButtonColumn(false)
     }
 
@@ -56,11 +56,8 @@ const TodoListWithDesign = () => {
     }
 
     const handleAddTask = () => {
-        console.log('statue', statue)
-        console.log('option', options)
         const newOptions = options.map((option) => {
             if (option.value === statue) {
-                console.log(typeof(option.list))
                 if (option.list) {
                     return { ...option, list: [...option.list, { id: uuidv4(), description: task }] }
                 }
@@ -81,9 +78,6 @@ const TodoListWithDesign = () => {
         })
         setOptions(newOptions)
     }
-
-
-
 
     return <div style={{ margin: '8px' }}>
         <Row justify={'space-between'}>
