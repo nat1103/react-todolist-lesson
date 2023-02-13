@@ -7,6 +7,7 @@ import { v4 as uuidv4 } from 'uuid';
 
 
 export interface ToDo {
+    id?: string;
     label: string;
     value: string;
     list?: Array<Task>;
@@ -14,15 +15,15 @@ export interface ToDo {
 
 export interface Task {
     id: string;
-    description: string;
+    value: string;
 
 }
 
 const TodoListWithDesign = () => {
     const defaultOptions: Array<ToDo> = [
-        { value: 'todo', label: 'To Do', list: [] },
-        { value: 'inprogress', label: 'In Progress', list: [] },
-        { value: 'done', label: 'Done', list: [] },
+        { id: uuidv4(), value: 'todo', label: 'To Do', list: [] },
+        { id: uuidv4(), value: 'inprogress', label: 'In Progress', list: [] },
+        { id: uuidv4(), value: 'done', label: 'Done', list: [] },
     ]
 
 
@@ -35,7 +36,7 @@ const TodoListWithDesign = () => {
     const [displayButtonTask, setDisplayButtonTask] = useState<Array<boolean>>([true, true])
 
     const handleGetNewColumn = (e: React.ChangeEvent<HTMLInputElement>) => {
-        setNewStatue({ label: e.target.value, value: e.target.value, list: [] });
+        setNewStatue({ id: uuidv4(), label: e.target.value, value: e.target.value, list: [] });
         setDisplayButtonColumn(false)
     }
 
@@ -59,7 +60,7 @@ const TodoListWithDesign = () => {
         const newOptions = options.map((option) => {
             if (option.value === statue) {
                 if (option.list) {
-                    return { ...option, list: [...option.list, { id: uuidv4(), description: task }] }
+                    return { ...option, list: [...option.list, { id: uuidv4(), value: task }] }
                 }
             }
             return option;

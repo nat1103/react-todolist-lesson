@@ -1,27 +1,46 @@
 import React, { useState } from 'react';
-import { Input, Button, Row, Select, List } from 'antd';
-import { ToDo } from '../TodoListWithDesign';
-import TodoItem from '../TodoListEdit/TodoItem';
 import { v4 as uuidv4 } from 'uuid';
+import AddColumn from './AddColumn/AddColumn';
+import AddItem from './AddItem/AddItem';
+import Column from './Column/Column';
+import ColumnModal from './ColumnModal/ColumnModal';
+import ItemModal from './ItemModal/ItemModal';
+
+export interface ToDo {
+    id?: string;
+    label?: string;
+    value?: string;
+    list?: Array<Task>;
+}
+
+export interface Task {
+    id: string;
+    value: string;
+
+}
 
 const TodoListEdit = () => {
     const defaultOptions: Array<ToDo> = [
-        { value: 'todo', label: 'To Do', list: [] },
-        { value: 'inprogress', label: 'In Progress', list: [] },
-        { value: 'done', label: 'Done', list: [] },
+        { id: uuidv4(), value: 'todo', label: 'To Do', list: [] },
+        { id: uuidv4(), value: 'inprogress', label: 'In Progress', list: [] },
+        { id: uuidv4(), value: 'done', label: 'Done', list: [] },
     ]
 
 
     const [options, setOptions] = useState<Array<ToDo>>(defaultOptions)
     const [newStatue, setNewStatue] = useState<ToDo>()
     const [displayButtonColumn, setDisplayButtonColumn] = useState<boolean>(true)
-
     const [task, setTask] = useState<string>('')
     const [statue, setStatue] = useState<string>('')
     const [displayButtonTask, setDisplayButtonTask] = useState<Array<boolean>>([true, true])
+    const [editColumn, setEditColumn] = useState<ToDo>();
+    const [editTask, setEditTask] = useState<Task>();
+    const [displayModalEditColumn, setDisplayModalEditColumn] = useState<boolean>(false);
+    const [displayModalEditItem, setDisplayModalEditItem] = useState<boolean>(false);
+
 
     const handleGetNewColumn = (e: React.ChangeEvent<HTMLInputElement>) => {
-        setNewStatue({ label: e.target.value, value: e.target.value, list: [] });
+        setNewStatue({ id: uuidv4(), label: e.target.value, value: e.target.value, list: [] });
         setDisplayButtonColumn(false)
     }
 
@@ -45,7 +64,7 @@ const TodoListEdit = () => {
         const newOptions = options.map((option) => {
             if (option.value === statue) {
                 if (option.list) {
-                    return { ...option, list: [...option.list, { id: uuidv4(), description: task }] }
+                    return { ...option, list: [...option.list, { id: uuidv4(), value: task }] }
                 }
             }
             return option;
@@ -65,68 +84,87 @@ const TodoListEdit = () => {
         setOptions(newOptions)
     }
 
-    const handleEditTask = (index: string) => {
-        const newOptions = options.map((option) => {
-            if (option.value === statue) {
-                if (option.list) {
-                    return {
-                        ...option, list: option.list.map((item) => {
-                            if (index === item.id) {
-                                return { ...item, description: task }
-                            }
-                            console.log('item', item)
-                            return item;
-                        })
-                    }
-                }
-            }
-            return option;
-        })
+    const handleDeleteColumn = (index: string) => {
+        const newOptions = options.filter((option) => index !== option.id)
         setOptions(newOptions)
     }
 
+    const handleEditColumn = (e: React.ChangeEvent<HTMLInputElement>) => {
+        if (editColumn) {
+            setEditColumn({ ...editColumn, label: e.target.value, value: e.target.value })
+        }
+    }
+
+    const handleSaveEditColumn = () => {
+        const newOptions = options.map((option) => {
+            if (editColumn !== undefined) {
+                if (option.id === editColumn.id) {
+                    return { ...option, label: editColumn.label, value: editColumn.value }
+                }
+                return option;
+            }
+            return option;
+        })
+        setOptions(newOptions);
+        setDisplayModalEditColumn(false);
+    }
+
+    const handleEditTask = (e: React.ChangeEvent<HTMLInputElement>) => {
+        if (editTask) {
+            setEditTask({ ...editTask, value: e.target.value })
+        }
+    }
+
+    const handleSaveEditTask = () => {
+        const newOptions = options.map((option) => {
+            if (editTask !== undefined && option.list !== undefined) {
+                option.list.map((item) => {
+                    if (item.id === editTask.id) {
+                        item.value = editTask.value;
+                    }
+                    
+                })
+                return option;
+            }
+            return option;
+        })
+        setOptions(newOptions);
+        setDisplayModalEditItem(false);
+    }
+
+    const handleCancel = () => {
+        setDisplayModalEditColumn(false);
+        setDisplayModalEditItem(false);
+    }
+    const handleShowModalColumn = (item: ToDo) => {
+        setEditColumn(item);
+        setDisplayModalEditColumn(true);
+    }
+
+    const handleShowModalItem = (item: Task) => {
+        setEditTask(item);
+        setDisplayModalEditItem(true);
+    }
 
     return <div style={{ margin: '8px' }}>
-        <Row justify={'space-between'}>
-            <Input
-                style={{ width: '90%' }}
-                onChange={handleGetNewColumn}
-            />
-            <Button
-                disabled={displayButtonColumn}
-                onClick={handleAddNewColumn}
-            >
-                Add Column</Button>
-        </Row>
-        <Row justify={'space-between'} style={{ marginTop: '8px' }}>
-            <Input
-                style={{ width: '80%' }}
-                onChange={handleGetTask}
-            />
-            <Select
-                style={{ width: '10%' }}
-                placeholder='Select column'
-                onChange={handleChangeStatue}
-                options={options}
-            />
-            <Button
-                disabled={!(displayButtonTask[1] === false && displayButtonTask[0] === false)}
-                onClick={handleAddTask}
-            >Add Item</Button>
-        </Row>
+        <AddColumn
+            handleGetNewColumn={handleGetNewColumn}
+            handleAddNewColumn={handleAddNewColumn}
+            displayButtonColumn={displayButtonColumn}
+        />
 
-        <Row justify="space-between" style={{ marginTop: '16px' }}>
-            {options.map(({ label, list }, index) =>
-                <List key={index}
-                    header={<div>{label}</div>}
-                    dataSource={list}
-                    style={{ width: options.length > 0 ? `${90 / options.length}%` : '100%', margin: '8px' }}
-                    renderItem={item => <List.Item style={{ background: 'rgba(235,235,235,255)' }}><TodoItem deleteTask={handleDeleteTask} editTask={handleEditTask} unique={item.id} label={item} /></List.Item>}
-                >
+        <AddItem
+            handleGetTask={handleGetTask}
+            handleChangeStatue={handleChangeStatue}
+            handleAddTask={handleAddTask}
+            displayButtonTask={displayButtonTask}
+            options={options}
+        />
 
-                </List>)}
-        </Row>
+        <Column options={options} handleDeleteTask={handleDeleteTask} handleShowModalItem={handleShowModalItem} handleShowModalColumn={handleShowModalColumn} handleDeleteColumn={handleDeleteColumn} />
 
+        <ColumnModal handleEditColumn={handleEditColumn} handleCancel={handleCancel} handleSaveEditColumn={handleSaveEditColumn} open={displayModalEditColumn} item={editColumn} />
+        <ItemModal handleEditItem={handleEditTask} handleCancel={handleCancel} handleSaveEditItem={handleSaveEditTask} open={displayModalEditItem} item={editTask} />
     </div>
 };
 

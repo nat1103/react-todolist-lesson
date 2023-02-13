@@ -12,7 +12,7 @@ interface TodoItemProps {
 const TodoItem = ({ deleteTask ,unique, label }: TodoItemProps) => {
     return (
         <>
-            {label.description}
+            {label.value}
             <Button
                 icon={<CloseOutlined />}
                 danger
