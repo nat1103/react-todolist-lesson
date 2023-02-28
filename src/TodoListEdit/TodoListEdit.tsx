@@ -122,7 +122,7 @@ const TodoListEdit = () => {
                     if (item.id === editTask.id) {
                         item.value = editTask.value;
                     }
-                    
+
                 })
                 return option;
             }
@@ -163,8 +163,20 @@ const TodoListEdit = () => {
 
         <Column options={options} handleDeleteTask={handleDeleteTask} handleShowModalItem={handleShowModalItem} handleShowModalColumn={handleShowModalColumn} handleDeleteColumn={handleDeleteColumn} />
 
-        <ColumnModal handleEditColumn={handleEditColumn} handleCancel={handleCancel} handleSaveEditColumn={handleSaveEditColumn} open={displayModalEditColumn} item={editColumn} />
-        <ItemModal handleEditItem={handleEditTask} handleCancel={handleCancel} handleSaveEditItem={handleSaveEditTask} open={displayModalEditItem} item={editTask} />
+        <ColumnModal
+            handleEditColumn={handleEditColumn}
+            handleCancel={handleCancel}
+            handleSaveEditColumn={handleSaveEditColumn}
+            open={displayModalEditColumn}
+            item={editColumn}
+        />
+        <ItemModal
+            handleEditItem={handleEditTask}
+            handleCancel={handleCancel}
+            handleSaveEditItem={handleSaveEditTask}
+            open={displayModalEditItem}
+            item={editTask}
+        />
     </div>
 };
 
